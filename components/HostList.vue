@@ -9,6 +9,10 @@ const hosts = ref<Host[]>([]);
 
 onMounted(async () => {
   hosts.value = await hostsStorage.getValue();
+
+  hostsStorage.watch((newHosts) => {
+    hosts.value = newHosts;
+  });
 });
 
 async function updateHost(updatedHost: Host) {
