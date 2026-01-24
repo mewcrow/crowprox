@@ -8,4 +8,7 @@ export default defineConfig({
     permissions: ["contextMenus", "proxy", "storage", "activeTab", "tabs"],
     action: {},
   },
+  autoIcons: {
+    developmentIndicator: false,
+  },
 });

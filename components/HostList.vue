@@ -2,10 +2,11 @@
 import { ref, onMounted } from "vue";
 import { Plus, Globe } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
-import HostItem from "@/components/HostItem.vue";
-import { hostsStorage, type Host } from "@/utils/storage";
 
-const hosts = ref<Host[]>([]);
+import HostItem from "@/components/HostItem.vue";
+import { hostsStorage } from "@/utils/storage";
+
+const hosts = ref<string[]>([]);
 
 onMounted(async () => {
   hosts.value = await hostsStorage.getValue();
@@ -15,39 +16,29 @@ onMounted(async () => {
   });
 });
 
-async function updateHost(updatedHost: Host) {
-  const index = hosts.value.findIndex((h) => h.id === updatedHost.id);
-  if (index !== -1) {
-    hosts.value[index] = updatedHost;
-    await hostsStorage.setValue([...hosts.value]);
-  }
-}
-
 async function addHostItem() {
-  const newHost: Host = {
-    id: crypto.randomUUID(),
-    name: "",
-    url: "",
-  };
-  hosts.value.push(newHost);
+  hosts.value.push("");
 }
 
-async function handleUpdate(updatedHost: Host) {
-  const index = hosts.value.findIndex((h) => h.id === updatedHost.id);
-  if (index !== -1) {
-    hosts.value[index] = updatedHost;
+async function handleUpdate(index: number, newUrl: string) {
+  if (index >= 0 && index < hosts.value.length) {
+    hosts.value[index] = newUrl;
     await hostsStorage.setValue([...hosts.value]);
   }
 }
 
-async function handleDelete(id: string) {
+async function handleDelete(index: number) {
   if (!confirm("Are you sure you want to delete this host?")) return;
-  hosts.value = hosts.value.filter((h) => h.id !== id);
-  await hostsStorage.setValue([...hosts.value]);
+  if (index >= 0 && index < hosts.value.length) {
+    hosts.value.splice(index, 1);
+    await hostsStorage.setValue([...hosts.value]);
+  }
 }
 
-function handleCancel(id: string) {
-  hosts.value = hosts.value.filter((h) => h.id !== id);
+function handleCancel(index: number) {
+  if (index >= 0 && index < hosts.value.length) {
+    hosts.value.splice(index, 1);
+  }
 }
 </script>
 
@@ -70,13 +61,13 @@ function handleCancel(id: string) {
 
     <div v-else class="list space-y-3">
       <HostItem
-        v-for="host in hosts"
-        :key="host.id"
-        :host="host"
-        :is-new="!host.url && !host.name"
-        @update="handleUpdate"
-        @delete="handleDelete"
-        @cancel="handleCancel"
+        v-for="(host, index) in hosts"
+        :key="index"
+        :url="host"
+        :is-new="!host"
+        @update="(newUrl) => handleUpdate(index, newUrl)"
+        @delete="() => handleDelete(index)"
+        @cancel="() => handleCancel(index)"
       />
     </div>
 

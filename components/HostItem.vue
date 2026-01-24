@@ -1,42 +1,39 @@
 <script setup lang="ts">
-import { ref, nextTick } from "vue";
+import { ref } from "vue";
 import { Pencil, Trash2, Check, X } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { Host } from "@/utils/storage";
-
 const props = defineProps<{
-  host: Host;
+  url: string;
   isNew?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: "update", updatedHost: Host): void;
-  (e: "delete", id: string): void;
-  (e: "cancel", id: string): void;
+  (e: "update", newUrl: string): void;
+  (e: "delete"): void;
+  (e: "cancel"): void;
 }>();
 
 const isEditing = ref(props.isNew || false);
-const editValue = ref(props.host.url);
-const inputRef = ref<InstanceType<typeof Input> | null>(null);
+const editValue = ref(props.url);
 
 function startEditing() {
-  editValue.value = props.host.url;
+  editValue.value = props.url;
   isEditing.value = true;
 }
 
 function save() {
   if (!editValue.value.trim()) return;
-  emit("update", { ...props.host, url: editValue.value });
+  emit("update", editValue.value);
   isEditing.value = false;
 }
 
 function cancel() {
   if (props.isNew) {
-    emit("cancel", props.host.id);
+    emit("cancel");
   } else {
     isEditing.value = false;
-    editValue.value = props.host.url;
+    editValue.value = props.url;
   }
 }
 </script>
@@ -83,7 +80,7 @@ function cancel() {
       <div
         class="flex-1 font-medium text-slate-700 dark:text-slate-300 truncate mr-4"
       >
-        {{ host.url }}
+        {{ url }}
       </div>
 
       <div
@@ -100,7 +97,7 @@ function cancel() {
         <Button
           size="icon"
           variant="ghost"
-          @click="$emit('delete', host.id)"
+          @click="$emit('delete')"
           class="h-9 w-9 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
         >
           <Trash2 class="h-4 w-4" />

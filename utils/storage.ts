@@ -1,11 +1,5 @@
-import { storage } from 'wxt/utils/storage';
+import { storage } from "wxt/utils/storage";
 
-export interface Host {
-  id: string;
-  name: string;
-  url: string;
-}
-
-export const hostsStorage = storage.defineItem<Host[]>('local:hosts', {
+export const hostsStorage = storage.defineItem<string[]>("local:hosts", {
   defaultValue: [],
 });
