@@ -50,7 +50,7 @@ function cancel() {
         <Input
           v-model="editValue"
           class="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 dark:text-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20"
-          placeholder="https://example.com"
+          placeholder="example.com"
           @keydown.enter="save"
           @keydown.esc="cancel"
           auto-focus

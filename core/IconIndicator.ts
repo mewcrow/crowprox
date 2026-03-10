@@ -3,8 +3,8 @@ import { icon } from "./Icon";
 import { proxy } from "./Proxy";
 
 export class IconIndicator {
-  public async initListeners() {
-    on("proxy:hosts-updated", () => this.refreshCurrentTabIcon());
+  public async init() {
+    on("proxy:config-updated", () => this.refreshCurrentTabIcon());
     on("icon:clicked", (tabId) => this.setTabExtensionIcon(tabId));
 
     browser.tabs.onActivated.addListener(async (tabInfo) => {
@@ -16,6 +16,9 @@ export class IconIndicator {
         this.setTabExtensionIcon(tabId);
       }
     });
+
+    const actionApi = browser.action || browser.browserAction; // manifest v3 or v2
+    actionApi.onClicked.addListener((tab) => emit("icon:clicked", tab.id!));
   }
 
   public async refreshCurrentTabIcon() {
@@ -33,8 +36,10 @@ export class IconIndicator {
     const tab = await browser.tabs.get(tabId);
     if (!tab.url) return;
 
-    const isProxied = proxy.isHostProxied(tab.url!);
+    const isProxied = proxy.isHostProxied(getUrlHost(tab.url!) as string);
     const imageData = isProxied ? icon.colored : icon.grayscale;
     actionApi.setIcon({ imageData: imageData as any, tabId });
   }
 }
+
+export const iconIndicator = new IconIndicator();

@@ -1,7 +1,7 @@
 import type { Browser } from "wxt/browser";
 
 class ContextMenu {
-  update() {
+  init() {
     browser.contextMenus.removeAll();
 
     browser.contextMenus.create({

@@ -1,8 +1,9 @@
 import mitt from "mitt";
+import type { TConfig } from "@/core/ConfigStorage";
 
 export type Events = {
   "icon:clicked": number;
-  "proxy:hosts-updated": string[];
+  "proxy:config-updated": TConfig;
 };
 
 export const eventBus = mitt<Events>();

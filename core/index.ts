@@ -1,3 +1,5 @@
+export * from "./ConfigStorage";
 export * from "./ContextMenu";
+export * from "./Icon";
 export * from "./IconIndicator";
 export * from "./Proxy";

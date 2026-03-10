@@ -3,9 +3,9 @@ export class Icon {
   public iconData: Record<string, ImageData> = {};
   public grayscaleIconData: Record<string, ImageData> = {};
 
-  public async prepare() {
+  public async init() {
     this.baseIcon = await this.loadBaseIcon();
-    this.iconData = await this.generate({ grayscale: false });
+    this.iconData = await this.generate();
     this.grayscaleIconData = await this.generate({ grayscale: true });
   }
 

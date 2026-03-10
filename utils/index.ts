@@ -12,3 +12,12 @@ export function getUrlHost(url: string) {
     return false;
   }
 }
+
+export function getTabHost(tab: Browser.tabs.Tab) {
+  if (!tab.url) return false;
+  return getUrlHost(tab.url);
+}
+
+export function realTypeOf(value: any) {
+  return Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
+}

@@ -1,5 +1,35 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import HostList from "@/components/HostList.vue";
+import ProxySettings from "@/components/ProxySettings.vue";
+import { configStorage } from "@/core/ConfigStorage";
+
+const config = configStorage.ref;
+
+const activeList = computed(() => {
+  if (config.value.proxyStrategy === "FixedServers") {
+    return config.value.bypassedHosts;
+  }
+  return config.value.proxiedHosts;
+});
+
+const listLabel = computed(() => {
+  if (config.value.proxyStrategy === "FixedServers") {
+    return "Bypassed Hosts";
+  }
+  return "Proxied Hosts";
+});
+
+const listAction = computed(() => {
+  if (config.value.proxyStrategy === "FixedServers") {
+    return "bypass";
+  }
+  return "proxy";
+});
+
+function saveConfig() {
+  configStorage.value = toRaw(config.value);
+}
 </script>
 
 <template>
@@ -19,7 +49,24 @@ import HostList from "@/components/HostList.vue";
     </div>
 
     <main class="container max-w-3xl py-24 px-4 sm:px-6">
-      <HostList />
+      <Suspense>
+        <template #default>
+          <div>
+            <ProxySettings />
+            <HostList
+              v-model="activeList"
+              :label="listLabel"
+              :action="listAction"
+              @save="saveConfig"
+            />
+          </div>
+        </template>
+        <template #fallback>
+          <div class="flex items-center justify-center py-12">
+            Loading configuration...
+          </div>
+        </template>
+      </Suspense>
     </main>
   </div>
 </template>

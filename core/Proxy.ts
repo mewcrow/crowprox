@@ -1,68 +1,51 @@
-import { hostsStorage } from "@/utils/storage";
-import { getUrlHost } from "@/utils";
 import { emit, on } from "@/utils/eventBus";
+import type { IProxyStrategy } from "./proxy-strategies/IProxyStrategy";
+import { configStorage } from "./ConfigStorage";
+import { OnRequestStrategy } from "./proxy-strategies/OnRequestStrategy";
+import { PacScriptStrategy } from "./proxy-strategies/PacScriptStrategy";
+import { FixedServersStrategy } from "./proxy-strategies/FixedServersStrategy";
 
 export class Proxy {
-  private proxiedHosts: string[] = [];
+  private strategy?: IProxyStrategy;
 
-  public initListeners() {
-    on("proxy:hosts-updated", (hosts) => (this.hosts = hosts));
-    on("icon:clicked", async (tabId) => {
-      const tab = await browser.tabs.get(tabId);
-      this.toggleHostProxying(tab.url!);
-    });
-  }
-
-  set hosts(hosts: string[]) {
-    this.proxiedHosts = hosts;
-    this.applySettings();
+  public init() {
+    this.initListeners();
+    this.applyConfig();
   }
 
   public isHostProxied(hostname: string) {
-    return this.proxiedHosts.some((h) => h === getUrlHost(hostname));
+    if (!configStorage.value.isEnabled) return false;
+    return this.strategy!.isHostProxied(hostname);
   }
 
-  public async toggleHostProxying(url: string) {
-    const hostname = getUrlHost(url);
-    if (!hostname) return;
-
-    const existingIndex = this.proxiedHosts.findIndex((h) => h === hostname);
-    if (existingIndex !== -1) {
-      this.proxiedHosts.splice(existingIndex, 1);
-    } else {
-      this.proxiedHosts.push(hostname);
-    }
-
-    await hostsStorage.setValue(this.proxiedHosts);
-  }
-
-  private async applySettings() {
-    if (this.proxiedHosts.length === 0) {
-      browser.proxy.settings.clear({ scope: "regular" });
+  public async applyConfig() {
+    if (!configStorage.value.isEnabled) {
+      await browser.proxy.settings.clear({});
       return;
     }
 
-    const pacScriptData = `
-      function FindProxyForURL(url, host) {
-        const proxiedHosts = ${JSON.stringify(this.proxiedHosts)};
+    this.setStrategy();
 
-        for (const h of proxiedHosts) {
-           if (host === h || host.endsWith("." + h)) {
-              return "PROXY 127.0.0.1:12334";
-           }
-        }
-        return "DIRECT";
-      }
-    `;
+    this.strategy?.applyConfig();
+  }
 
-    const config = {
-      mode: "pac_script" as const,
-      pacScript: {
-        data: pacScriptData,
-      },
-    };
+  private initListeners() {
+    on("icon:clicked", async (tabId) =>
+      this.strategy!.toggleTabProxying(tabId),
+    );
+    on("proxy:config-updated", () => {
+      this.applyConfig();
+    });
+  }
 
-    browser.proxy.settings.set({ value: config, scope: "regular" });
+  private setStrategy() {
+    if (configStorage.value.proxyStrategy === "OnRequest") {
+      this.strategy = new OnRequestStrategy() as unknown as IProxyStrategy;
+    } else if (configStorage.value.proxyStrategy === "PacScript") {
+      this.strategy = new PacScriptStrategy() as unknown as IProxyStrategy;
+    } else {
+      this.strategy = new FixedServersStrategy();
+    }
   }
 }
 
