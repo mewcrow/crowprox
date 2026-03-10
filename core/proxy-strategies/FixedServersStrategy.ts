@@ -24,11 +24,20 @@ export class FixedServersStrategy implements IProxyStrategy {
 
   isHostProxied(hostname: string): boolean {
     if (!hostname) return false;
-    return !configStorage.value.bypassedHosts.includes(hostname);
+    const lvl1domain = hostname.split(".").slice(-2).join(".");
+    return !configStorage.value.bypassedHosts.includes(lvl1domain);
   }
 
   public async applyConfig() {
     const proxyServer = configStorage.value.proxyServer;
+    const bypassedHosts = configStorage.value.bypassedHosts.reduce(
+      (acc, host) => {
+        acc.push(host);
+        acc.push(`.${host}`);
+        return acc;
+      },
+      [] as string[],
+    );
 
     const proxyConfig = {
       mode: "fixed_servers" as const,
@@ -38,7 +47,7 @@ export class FixedServersStrategy implements IProxyStrategy {
           host: proxyServer.host,
           port: proxyServer.port,
         },
-        bypassList: ["<local>", ...configStorage.value.bypassedHosts],
+        bypassList: ["<local>", ...bypassedHosts],
       },
     };
 
