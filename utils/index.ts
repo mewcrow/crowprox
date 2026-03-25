@@ -1,23 +1,23 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
 export function getUrlHost(url: string) {
   try {
-    return new URL(url).hostname;
+    return new URL(url).hostname
   } catch (error) {
-    return false;
+    return false
   }
 }
 
 export function getTabHost(tab: Browser.tabs.Tab) {
-  if (!tab.url) return false;
-  return getUrlHost(tab.url);
+  if (!tab.url) return false
+  return getUrlHost(tab.url)
 }
 
 export function realTypeOf(value: any) {
-  return Object.prototype.toString.call(value).slice(8, -1).toLowerCase();
+  return Object.prototype.toString.call(value).slice(8, -1).toLowerCase()
 }

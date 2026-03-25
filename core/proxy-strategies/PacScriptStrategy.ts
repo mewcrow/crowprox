@@ -1,12 +1,12 @@
 export class PacScriptStrategy {
   constructor() {
-    console.error("PacScriptStrategy not implemented");
+    console.error('PacScriptStrategy not implemented')
   }
 
   applyConfig(config: TConfig) {
     if (config.proxiedHosts.length === 0) {
-      browser.proxy.settings.clear({ scope: "regular" });
-      return;
+      browser.proxy.settings.clear({ scope: 'regular' })
+      return
     }
 
     const pacScriptData = `
@@ -20,15 +20,15 @@ export class PacScriptStrategy {
         }
         return "DIRECT";
       }
-    `;
+    `
 
     const proxyConfig = {
-      mode: "pac_script" as const,
+      mode: 'pac_script' as const,
       pacScript: {
         data: pacScriptData,
       },
-    };
+    }
 
-    browser.proxy.settings.set({ value: proxyConfig, scope: "regular" });
+    browser.proxy.settings.set({ value: proxyConfig, scope: 'regular' })
   }
 }

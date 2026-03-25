@@ -1,27 +1,25 @@
-import type { Browser } from "wxt/browser";
+import type { Browser } from 'wxt/browser'
 
 class ContextMenu {
   init() {
-    browser.contextMenus.removeAll();
+    browser.contextMenus.removeAll()
 
     browser.contextMenus.create({
-      id: "proxy-config",
-      title: "Proxy config",
-      contexts: ["action"],
-    });
+      id: 'proxy-config',
+      title: 'Proxy config',
+      contexts: ['action'],
+    })
 
-    browser.contextMenus.onClicked.addListener((info) =>
-      this.handleContextClick(info),
-    );
+    browser.contextMenus.onClicked.addListener((info) => this.handleContextClick(info))
   }
 
   private handleContextClick(info: Browser.contextMenus.OnClickData) {
-    if (info.menuItemId === "proxy-config") {
+    if (info.menuItemId === 'proxy-config') {
       browser.tabs.create({
-        url: browser.runtime.getURL("/proxy-config.html" as any),
-      });
+        url: browser.runtime.getURL('/proxy-config.html' as any),
+      })
     }
   }
 }
 
-export const contextMenu = new ContextMenu();
+export const contextMenu = new ContextMenu()
