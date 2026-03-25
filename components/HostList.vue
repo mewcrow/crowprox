@@ -15,9 +15,8 @@ const emit = defineEmits<{
 }>();
 
 function addHost() {
-  if (list.value) {
-    list.value.push("");
-  }
+  if (!list.value[0]) return;
+  list.value.unshift("");
 }
 
 function handleUpdate(index: number, newUrl: string) {
@@ -77,7 +76,7 @@ function handleCancel(index: number) {
     <div v-else class="list space-y-3">
       <HostItem
         v-for="(host, index) in list"
-        :key="index"
+        :key="host || `host-${index}`"
         :url="host"
         :is-new="!host"
         @update="(newUrl) => handleUpdate(index, newUrl)"

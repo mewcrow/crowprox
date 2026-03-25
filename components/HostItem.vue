@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, nextTick, onMounted } from "vue";
 import { Pencil, Trash2, Check, X } from "lucide-vue-next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ const emit = defineEmits<{
 
 const isEditing = ref(props.isNew || false);
 const editValue = ref(props.url);
+const containerRef = ref<HTMLDivElement | null>(null);
 
 function startEditing() {
   editValue.value = props.url;
@@ -36,10 +37,19 @@ function cancel() {
     editValue.value = props.url;
   }
 }
+
+onMounted(() => {
+  if (props.isNew) {
+    nextTick(() => {
+      containerRef.value?.querySelector("input")?.focus();
+    });
+  }
+});
 </script>
 
 <template>
   <div
+    ref="containerRef"
     class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 shadow-sm transition-all hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-500/30 group"
   >
     <div
@@ -53,7 +63,6 @@ function cancel() {
           placeholder="example.com"
           @keydown.enter="save"
           @keydown.esc="cancel"
-          auto-focus
         />
       </div>
       <div class="flex items-center gap-1">
