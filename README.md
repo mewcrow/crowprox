@@ -1,9 +1,8 @@
 # CrowProx
-
-![crowprox_pixelate](https://github.com/user-attachments/assets/a04e2b42-51c4-4742-8c3d-fe5f8c507a4c)
-
 This extension allows you to proxy browser traffic or individual tabs through proxy servers.
 Currently tested in Chromium with a local proxy (Hiddify on port 12334).
+
+![crowprox_pixelate](https://github.com/user-attachments/assets/a04e2b42-51c4-4742-8c3d-fe5f8c507a4c)
 
 ## Features
 
